@@ -5,6 +5,8 @@ import java.util.List;
 
 import objects.Period;
 import settings.Settings;
+import timeline.Camera;
+import timeline.Timeline;
 import utilities.TextUtils;
 
 public class PeriodPositioning {
@@ -17,22 +19,21 @@ public class PeriodPositioning {
 	
 	private int nameYPosition;
 	
-	public PeriodPositioning(Period period, int periodLayer, float zoom) {
+	public PeriodPositioning(Period period, int periodLayer, Camera camera) {
 		this.periodLayer = periodLayer;
 		
-		definePositioning(period, zoom);
+		definePositioning(period, camera);
 	}
 	
-	public PeriodPositioning(Period period, float zoom) {
+	public PeriodPositioning(Period period, Camera camera) {
 		this.periodLayer = 0;
 		
-		definePositioning(period, zoom);
+		definePositioning(period, camera);
 	}
 	
-	
-	private void definePositioning(Period period, float zoom) {
-		int x1 = (int) (period.getStartDate() * zoom);
-		int x2 = (int) (period.getEndDate() * zoom);
+	private void definePositioning(Period period, Camera camera) {
+		int x1 = (int) ((period.getStartDate() - camera.getX()) * camera.getZoom() + camera.getX()) + Timeline.WIDTH / 2;
+		int x2 = (int) ((period.getEndDate() - camera.getX()) * camera.getZoom() + camera.getX()) + Timeline.WIDTH / 2;
 		int y1 = (int) (Settings.Y_PADDING + periodLayer * Settings.PERIOD_LAYER_SIZE);
 		int width = x2 - x1;
 		
@@ -49,9 +50,9 @@ public class PeriodPositioning {
 		hitbox = new Hitbox(hitbox.getPreciseX(), y1, hitbox.getWidth(), Settings.PERIOD_HEIGHT);
 	}
 	
-	public void zoomChanged(Period period, float zoom) {
-		int x1 = (int) (period.getStartDate() * zoom);
-		int x2 = (int) (period.getEndDate() * zoom);
+	public void zoomChanged(Period period, Camera camera) {
+		int x1 = (int) ((period.getStartDate() - camera.getX()) * camera.getZoom() + camera.getX()) + Timeline.WIDTH / 2;
+		int x2 = (int) ((period.getEndDate() - camera.getX()) * camera.getZoom() + camera.getX()) + Timeline.WIDTH / 2;
 		int width = x2 - x1;
 		hitbox = new Hitbox(x1, hitbox.getPreciseY(), width, hitbox.getHeight());
 		

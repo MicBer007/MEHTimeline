@@ -11,7 +11,7 @@ import logging.LogLevel;
 
 public class Camera implements MouseListener, MouseMotionListener, MouseWheelListener {
 	
-	private Log log = new Log(this.getClass().getSimpleName(), LogLevel.ERROR);
+	private Log log = new Log(this.getClass().getSimpleName(), LogLevel.WARN);
 	
 	private int x = 0;
 	private int y = 0;
@@ -20,10 +20,10 @@ public class Camera implements MouseListener, MouseMotionListener, MouseWheelLis
 	
 	private static final int MIN_X = -10000;
 	private static final int MAX_X = 10000;
-	private static final int MIN_Y = -20;
+	private static final int MIN_Y = -20 + Timeline.HEIGHT / 2;
 	
 	private static final float MIN_ZOOM = 0.1f;
-	private static final float MAX_ZOOM = 10f;
+	private static final float MAX_ZOOM = 4f;
 	
 	private ObjectManager manager;
 	
@@ -33,24 +33,41 @@ public class Camera implements MouseListener, MouseMotionListener, MouseWheelLis
 	
 	public Camera(ObjectManager manager, int x, int y) {
 		this.manager = manager;
-		setX(x);
+		setXYear(x);
 		setY(y);
+	}
+	
+	public int getXAtCorner() {
+		return (int) (x - (Timeline.WIDTH / 2 * zoom));
 	}
 	
 	public int getX() {
 		return x;
 	}
 	
-	public void setX(int x) {
-		this.x = x;
-		if(x > MAX_X / zoom) this.x = (int) (MAX_X / zoom);
-		else if(x < MIN_X / zoom) this.x = (int) (MIN_X / zoom);
-		System.out.println(this.x);
-		System.out.println(zoom);
+	public void setXIncludingZoom(int x) {
+		int xDiff = this.x - x;
+		this.x = (int) (xDiff / zoom);
+		if(x > MAX_X) this.x = MAX_X;
+		else if(x < MIN_X) this.x = MIN_X;
 	}
 	
-	public void changeX(int change) {
-		setX(x + (int) (change * zoom));
+	public void changeXIncludingZoom(int change) {
+		setXYear((int) (x + change / zoom));
+	}
+	
+	public void setXYear(int x) {
+		this.x = x;
+		if(x > MAX_X) this.x = MAX_X;
+		else if(x < MIN_X) this.x = MIN_X;
+	}
+	
+	public void changeXYear(int change) {
+		setXYear(x + change);
+	}
+	
+	public int getYAtCorner() {
+		return y - Timeline.HEIGHT / 2;
 	}
 	
 	public int getY() {
@@ -63,7 +80,7 @@ public class Camera implements MouseListener, MouseMotionListener, MouseWheelLis
 	}
 	
 	public void changeY(int change) {
-		setY(y + (int) (change * zoom));
+		setY(y + change);
 	}
 
 	public float getZoom() {
@@ -71,22 +88,14 @@ public class Camera implements MouseListener, MouseMotionListener, MouseWheelLis
 	}
 
 	public void setZoom(float zoom) {
-		float oldZoom = this.zoom;
 		
-		this.zoom = zoom;
+		manager.updateZoomSpecifications(zoom, this.zoom);
 		
 		if(zoom > MAX_ZOOM) this.zoom = MAX_ZOOM;
 		else if(zoom < MIN_ZOOM) this.zoom = MIN_ZOOM;
+		else this.zoom = zoom;
 		
-		log.info("Zoom is now " + this.zoom + ".");
-
-		float change = this.zoom / oldZoom;
-		
-		int midScreenX = x + Timeline.WIDTH / 2;
-		int newX = (int) (midScreenX * change - Timeline.WIDTH / 2);
-		setX(newX);
-		
-		manager.updateZoomSpecifications(zoom);
+		log.info("Zoom is now " + this.zoom);
 	}
 	
 	public void changeZoom(float change) {
@@ -97,10 +106,11 @@ public class Camera implements MouseListener, MouseMotionListener, MouseWheelLis
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		int diffX = pressedX - e.getX();
-		int diffY = pressedY - e.getY();
-		setX(diffX);
-		setY(diffY);
+		int newX = pressedX - (int) ((e.getX() - Timeline.WIDTH / 2));
+		int newY = pressedY - (e.getY() - Timeline.HEIGHT / 2);
+		
+		setXYear(newX);
+		setY(newY);
 	}
 
 	@Override
@@ -108,8 +118,8 @@ public class Camera implements MouseListener, MouseMotionListener, MouseWheelLis
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		pressedX = e.getX() + x;
-		pressedY = e.getY() + y;
+		pressedX = (int) ((e.getX() - Timeline.WIDTH / 2)  + x);
+		pressedY = e.getY() - Timeline.HEIGHT / 2 + y;
 	}
 
 	@Override

@@ -2,6 +2,8 @@ package settings;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Settings {
 	
@@ -24,5 +26,22 @@ public class Settings {
 	public static final Font PERIOD_TEXT_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
 	
 	public static final int ITEM_LAYER_SIZE = 42;
+	
+	
+	public static final int TIMELINE_START = 0;
+	public static final int TIMELINE_END = 2300;
+	
+	public static final int SIGNIFICANT_DATE_INTERVAL = 50;
+	public static final int SIGNIFICANT_DATE_MARKER_HEIGHT = 4;//in both directions
+	
+	public static final List<Integer> DATELINE_DATES = generateDatelineDates();
+	
+	private static List<Integer> generateDatelineDates(){
+		List<Integer> dates = new ArrayList<Integer>();;
+		for(int i = TIMELINE_START; i < TIMELINE_END; i += SIGNIFICANT_DATE_INTERVAL) {
+			dates.add(i);
+		}
+		return dates;
+	}
 	
 }

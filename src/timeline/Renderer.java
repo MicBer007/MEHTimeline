@@ -5,6 +5,7 @@ import java.awt.Graphics;
 
 import logging.Log;
 import logging.LogLevel;
+import objects.Dateline;
 import objects.Item;
 import objects.Period;
 import positioning.Hitbox;
@@ -16,17 +17,29 @@ public class Renderer {
 	@SuppressWarnings("unused")
 	private Log log = new Log(this.getClass().getSimpleName(), LogLevel.ERROR);
 	
+	private int cameraX;
+	private int cameraY;
+	
 	public Renderer() {}
+	
+	public void prepareForRender(Camera camera) {
+		cameraX = (int) (-camera.getXAtCorner() * camera.getZoom());
+		cameraY = -camera.getYAtCorner();
+	}
 	
 	public void renderBackground(Graphics g) {
 		g.setColor(Settings.BACKGROUND_COLOR);
 		g.fillRect(0, 0, Timeline.WIDTH, Timeline.HEIGHT);
 	}
 	
-	public void renderLine(Graphics g, Camera camera) {
+	public void renderLine(Graphics g, Camera camera, Dateline dateline) {
 		g.setColor(Color.BLACK);
-		int lineHeight = Settings.DATELINE_HEIGHT - camera.getY();
-		g.drawLine(0, lineHeight, Timeline.WIDTH, lineHeight);
+		int markerStartY = dateline.getPositioning().getDatelineYPosition() - Settings.SIGNIFICANT_DATE_MARKER_HEIGHT + cameraY;
+		g.drawLine(0, dateline.getPositioning().getDatelineYPosition() + cameraY, Timeline.WIDTH, dateline.getPositioning().getDatelineYPosition() + cameraY);
+		
+		for(Integer x: dateline.getPositioning().getDateXPositionsAfterCameraManipulations()) {
+			g.drawLine(x + cameraX, markerStartY, x + cameraX, markerStartY + Settings.SIGNIFICANT_DATE_MARKER_HEIGHT * 2);
+		}
 	}
 	
 	public void renderPeriod(Graphics g, Period period, Camera camera) {
@@ -34,16 +47,16 @@ public class Renderer {
 		Hitbox h = positions.getHitbox();
 		
 		g.setColor(period.getDisplayColour());
-		g.fillRect(h.getX() - camera.getX(), h.getY() - camera.getY(), h.getWidth(), h.getHeight());
+		g.fillRect(h.getX() + cameraX, h.getY() + cameraY, h.getWidth(), h.getHeight());
 		
-		int textY = positions.getNameYPosition() - camera.getY();
-		g.setColor(period.getTextColour());
-		for(int i = 0; i < positions.getNameXPositions().size(); i++) {
-			g.drawString(period.getPeriodName(), positions.getNameXPositions().get(i) - camera.getX(), textY);
-		}
+//		int textY = positions.getNameYPosition() + cameraY;
+//		g.setColor(period.getTextColour());
+//		for(int i = 0; i < positions.getNameXPositions().size(); i++) {
+//			g.drawString(period.getPeriodName(), positions.getNameXPositions().get(i) + cameraX, textY);
+//		}
 	}
 	
-	public void renderItem(Graphics g, Item item, Camera camera) {
+	public void renderItem(Graphics g, Item item) {
 		
 	}
 

@@ -7,6 +7,7 @@ import java.util.List;
 
 import logging.Log;
 import logging.LogLevel;
+import objects.Dateline;
 import objects.Item;
 import objects.Period;
 import positioning.PeriodPositioning;
@@ -19,6 +20,8 @@ public class ObjectManager {
 	
 	private List<Item> items = new ArrayList<Item>();
 	
+	private Dateline dateline;
+	
 	private Camera camera;
 	private Renderer renderer;
 	
@@ -30,27 +33,32 @@ public class ObjectManager {
 		definePeriod("Reformation 2", 1517, 1648, Color.YELLOW, 1);
 		
 		items.add(new Item("Martin Luther", 1486, 1543));
+		
+		dateline = new Dateline(camera);
 	}
 	
 	public void render(Graphics g) {
+		renderer.prepareForRender(camera);
+		
 		renderer.renderBackground(g);
 		
 		for(Item item: items) {
-			renderer.renderItem(g, item, camera);
+			renderer.renderItem(g, item);
 		}
 		
 		for(Period period: periods) {
 			renderer.renderPeriod(g, period, camera);
 		}
 		
-		renderer.renderLine(g, camera);
+		renderer.renderLine(g, camera, dateline);
 	}
 	
-	public void updateZoomSpecifications(float newZoom) {
+	public void updateZoomSpecifications(float newZoom, float oldZoom) {
 		log.info("Updating positions!", 6);
 		for(Period period: periods) {
-			period.getPositioning().zoomChanged(period, newZoom);
+			period.getPositioning().zoomChanged(period, camera);
 		}
+		dateline.getPositioning().updateDatePositions(camera, oldZoom);
 	}
 	
 	private int numberOfTicksBeforeScrollRealised = 5;
@@ -61,7 +69,7 @@ public class ObjectManager {
 	
 	public void mouseScrolled(float scrollAmount) {
 		lastMouseScrollTick = ticks;
-		totalScrollAmount += scrollAmount;
+		totalScrollAmount -= scrollAmount;
 	}
 	
 	private int ticks = 0;
@@ -76,7 +84,7 @@ public class ObjectManager {
 	
 	private Period definePeriod(String title, int startDate, int endDate, Color periodColour, int periodLayer) {
 		Period period = new Period(title, startDate, endDate, periodColour, Color.BLACK);
-		period.setPositioning(new PeriodPositioning(period, periodLayer, camera.getZoom()));
+		period.setPositioning(new PeriodPositioning(period, periodLayer, camera));
 		periods.add(period);
 		log.info("New period added.");
 		return period;
