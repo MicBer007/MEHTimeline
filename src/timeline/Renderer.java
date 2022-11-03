@@ -23,7 +23,9 @@ public class Renderer {
 	public Renderer() {}
 	
 	public void prepareForRender(Camera camera) {
-		cameraX = (int) (-camera.getXAtCorner() * camera.getZoom());
+		cameraX = (int) (-camera.getXAtCorner());
+//		cameraX = Timeline.WIDTH / 2;
+//		cameraX = 0;
 		cameraY = -camera.getYAtCorner();
 	}
 	
@@ -40,6 +42,10 @@ public class Renderer {
 		for(Integer x: dateline.getPositioning().getDateXPositionsAfterCameraManipulations()) {
 			g.drawLine(x + cameraX, markerStartY, x + cameraX, markerStartY + Settings.SIGNIFICANT_DATE_MARKER_HEIGHT * 2);
 		}
+		
+		g.drawLine(cameraX, 0, cameraX, Timeline.HEIGHT);
+		g.setColor(Color.RED);
+		g.drawLine(Timeline.WIDTH / 2, 0, Timeline.WIDTH / 2, Timeline.HEIGHT);
 	}
 	
 	public void renderPeriod(Graphics g, Period period, Camera camera) {

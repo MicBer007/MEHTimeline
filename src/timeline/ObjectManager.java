@@ -46,9 +46,9 @@ public class ObjectManager {
 			renderer.renderItem(g, item);
 		}
 		
-		for(Period period: periods) {
-			renderer.renderPeriod(g, period, camera);
-		}
+//		for(Period period: periods) {
+//			renderer.renderPeriod(g, period, camera);
+//		}
 		
 		renderer.renderLine(g, camera, dateline);
 	}

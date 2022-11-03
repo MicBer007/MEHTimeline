@@ -92,6 +92,9 @@ public class Timeline extends Canvas implements Runnable {
 			if(System.currentTimeMillis() - timer > 1000) {
 				timer += 1000;
 				log.info("FPS: " + FPS, 10);
+				log.info("Camera X: " + manager.getCamera().getXYear(), 10);
+				log.info("Camera X Zoom: " + manager.getCamera().getXIncludingZoom(), 10);
+				log.info("Camera Zoom: " + manager.getCamera().getZoom(), 10);
 				FPS = 0;
 			}
 		}

@@ -29,7 +29,7 @@ public class Settings {
 	
 	
 	public static final int TIMELINE_START = 0;
-	public static final int TIMELINE_END = 2300;
+	public static final int TIMELINE_END = 200;
 	
 	public static final int SIGNIFICANT_DATE_INTERVAL = 50;
 	public static final int SIGNIFICANT_DATE_MARKER_HEIGHT = 4;//in both directions
