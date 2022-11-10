@@ -29,12 +29,14 @@ public class ObjectManager {
 		camera = new Camera(this, 0, 0);
 		renderer = new Renderer();
 		
-		definePeriod("Reformation", 1517, 2150, Color.YELLOW, 0);
-		definePeriod("Reformation 2", 1517, 1648, Color.YELLOW, 1);
+		dateline = new Dateline(camera);
+		
+		definePeriod("Reformation", 1517, 1648, Color.YELLOW, 0);
+		definePeriod("Reformation", 1517, 1648, Color.YELLOW, 1);
+		definePeriod("Reformation", 1517, 1648, Color.YELLOW, 2);
+		definePeriod("Reformation", 1517, 1648, Color.YELLOW, 3);
 		
 		items.add(new Item("Martin Luther", 1486, 1543));
-		
-		dateline = new Dateline(camera);
 	}
 	
 	public void render(Graphics g) {
@@ -46,19 +48,19 @@ public class ObjectManager {
 			renderer.renderItem(g, item);
 		}
 		
-//		for(Period period: periods) {
-//			renderer.renderPeriod(g, period, camera);
-//		}
+		for(Period period: periods) {
+			renderer.renderPeriod(g, period, camera);
+		}
 		
 		renderer.renderLine(g, camera, dateline);
 	}
 	
-	public void updateZoomSpecifications(float newZoom, float oldZoom) {
+	public void updateZoomSpecifications() {
 		log.info("Updating positions!", 6);
 		for(Period period: periods) {
-			period.getPositioning().zoomChanged(period, camera);
+			period.getPositioning().refreshPositioningAfterZoomChange(period, camera);
 		}
-		dateline.getPositioning().updateDatePositions(camera, oldZoom);
+		dateline.getPositioning().updateDatePositions(camera);
 	}
 	
 	private int numberOfTicksBeforeScrollRealised = 5;
@@ -77,8 +79,9 @@ public class ObjectManager {
 	public void tick() {
 		ticks++;
 		if(totalScrollAmount != 0 && ticks - lastMouseScrollTick > numberOfTicksBeforeScrollRealised) {
-			camera.changeZoom(totalScrollAmount * 0.05f);
+			camera.changeZoom(totalScrollAmount * 0.1f);
 			totalScrollAmount = 0;
+			updateZoomSpecifications();
 		}
 	}
 	

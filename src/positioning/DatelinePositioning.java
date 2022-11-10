@@ -3,6 +3,7 @@ package positioning;
 import java.util.ArrayList;
 import java.util.List;
 
+import settings.Settings;
 import timeline.Camera;
 import utilities.Maths;
 
@@ -16,14 +17,14 @@ public class DatelinePositioning {
 	
 	public DatelinePositioning(Camera camera, List<Integer> dates) {
 		dateXPositions = dates;
-		datelineYPosition = 10;
-		updateDatePositions(camera, camera.getZoom());
+		datelineYPosition = Settings.DATELINE_HEIGHT;
+		updateDatePositions(camera);
 	}
 	
-	public void updateDatePositions(Camera camera, float oldZoom) {
+	public void updateDatePositions(Camera camera) {
 		dateXPositionsAfterCameraManipulations.clear();
-		for(Integer i: dateXPositions) {
-			dateXPositionsAfterCameraManipulations.add(Maths.getXPositionAfterCameraZoomChange(camera, i, oldZoom));
+		for(Integer xPosition: dateXPositions) {
+			dateXPositionsAfterCameraManipulations.add(Maths.getXPositionAfterCameraZoomChange(camera, xPosition));
 		}
 	}
 

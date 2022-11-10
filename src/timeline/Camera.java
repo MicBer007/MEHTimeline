@@ -11,21 +11,11 @@ import logging.LogLevel;
 
 public class Camera implements MouseListener, MouseMotionListener, MouseWheelListener {
 	
-	private Log log = new Log(this.getClass().getSimpleName(), LogLevel.WARN);
+	private Log log = new Log(this.getClass().getSimpleName(), LogLevel.INFO);
 	
-	private int y = 0; //same as yYear
-
-	private int x = 0;
-	private int xYear = 0;
+	private int x, y;
 	
-	private float zoom = 1f;
-	
-	private static final int MIN_X = -10000;
-	private static final int MAX_X = 10000;
-	private static final int MIN_Y = -20 + Timeline.HEIGHT / 2;
-	
-	private static final float MIN_ZOOM = 0.05f;
-	private static final float MAX_ZOOM = 2f;
+	private float zoom = 1.0f;
 	
 	private ObjectManager manager;
 	
@@ -35,119 +25,113 @@ public class Camera implements MouseListener, MouseMotionListener, MouseWheelLis
 	
 	public Camera(ObjectManager manager, int x, int y) {
 		this.manager = manager;
-		setXYear(x);
-		setY(y);
+		this.x = x;
+		this.y = y;
 	}
 	
-	public int getXAtCorner() {
-		return (int) (x - (Timeline.WIDTH / 2));
+	public Camera(ObjectManager manager, float zoom) {
+		this.manager = manager;
+		this.zoom = zoom;
 	}
 	
-	public int getXYear() {
-		return xYear;
+	public Camera(ObjectManager manager, int x, int y, float zoom) {
+		this.manager = manager;
+		this.x = x;
+		this.y = y;
+		this.zoom = zoom;
 	}
 	
-	public int getXIncludingZoom() {
+	public int getX() {
 		return x;
 	}
 	
-	public void setXYear(int x) {
-		this.xYear = x;
-		if(x > MAX_X) this.xYear = MAX_X;
-		else if(x < MIN_X) this.xYear = MIN_X;
-		updateZoomedCoords();
+	public void setX(int x) {
+		this.x = x;
 	}
 	
-	public void changeXYear(int change) {
-		setXYear(xYear + change);
-	}
-	
-	public void setXIncludingZoom(int xWithZoom) {
-		setXYear((int) (xWithZoom / zoom));
-	}
-	
-	public void changeXIncludingZoom(int change) {
-		changeXYear((int) (change / zoom));
-	}
-	
-	public void updateZoomedCoords() {
-		x = (int) (xYear * zoom);
-	}
-	
-	public int getYAtCorner() {
-		return y - Timeline.HEIGHT / 2;
+	public void changeX(int change) {
+		setX(x + change);
 	}
 	
 	public int getY() {
 		return y;
 	}
 	
+	private final int MIN_Y = 0;
+	
 	public void setY(int y) {
 		this.y = y;
-		if(y < MIN_Y) this.y = MIN_Y;
+		
+		if(this.y < MIN_Y) this.y = MIN_Y;
 	}
 	
 	public void changeY(int change) {
 		setY(y + change);
 	}
-
+	
 	public float getZoom() {
 		return zoom;
 	}
-
+	
+	private final float MIN_ZOOM = 0.5f;
+	private final float MAX_ZOOM = 10f;
+	
 	public void setZoom(float zoom) {
+		this.zoom = zoom;
 		
-		float oldZoom = this.zoom;
-		
-		if(zoom > MAX_ZOOM) this.zoom = MAX_ZOOM;
-		else if(zoom < MIN_ZOOM) this.zoom = MIN_ZOOM;
-		else this.zoom = zoom;
-		
-		manager.updateZoomSpecifications(this.zoom, oldZoom);
-		
-		log.info("Zoom is now " + this.zoom);
+		if(this.zoom < MIN_ZOOM) {
+			this.zoom = MIN_ZOOM;
+		} else if(this.zoom > MAX_ZOOM) {
+			this.zoom = MAX_ZOOM;
+		}
 	}
 	
 	public void changeZoom(float change) {
 		setZoom(zoom + change);
 	}
-
+	
 	private int pressedX, pressedY;
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		int newX = pressedX - (int) ((e.getX() - Timeline.WIDTH / 2));
-		int newY = pressedY - (e.getY() - Timeline.HEIGHT / 2);
-		
-		setXIncludingZoom(newX);
-		setY(newY);
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) { }
-
+	
 	@Override
 	public void mousePressed(MouseEvent e) {
-		pressedX = (int) ((e.getX() - Timeline.WIDTH / 2)  + x);
-		pressedY = e.getY() - Timeline.HEIGHT / 2 + y;
+		log.info("Mouse Pressed");
+		pressedX = e.getX();
+		pressedY = e.getY();
+	}
+	
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		int deltaX = pressedX - e.getX();
+		int deltaY = pressedY - e.getY();
+		
+		changeX((int) (deltaX / zoom));
+		changeY(deltaY);
+		
+		pressedX = e.getX();
+		pressedY = e.getY();
 	}
 	
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
+		log.info("Mouse Wheel Moved");
 		manager.mouseScrolled((float) e.getPreciseWheelRotation());
 	}
 	
 	
 	
+	
+	@Override
+	public void mouseMoved(MouseEvent e) { }
+	
 	@Override
 	public void mouseReleased(MouseEvent e) { }
-
+	
 	@Override
 	public void mouseClicked(MouseEvent e) { }
-
+	
 	@Override
 	public void mouseEntered(MouseEvent e) { }
-
+	
 	@Override
 	public void mouseExited(MouseEvent e) { }
 	

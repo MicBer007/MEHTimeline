@@ -6,6 +6,7 @@ import java.util.List;
 import objects.Period;
 import settings.Settings;
 import timeline.Camera;
+import utilities.Maths;
 import utilities.TextUtils;
 
 public class PeriodPositioning {
@@ -21,41 +22,34 @@ public class PeriodPositioning {
 	public PeriodPositioning(Period period, int periodLayer, Camera camera) {
 		this.periodLayer = periodLayer;
 		
-		definePositioning(period, camera);
+		refreshPositioningAfterZoomChange(period, camera);
+
+		nameYPosition = hitbox.getY2() - 4;
 	}
 	
 	public PeriodPositioning(Period period, Camera camera) {
 		this.periodLayer = 0;
 		
-		definePositioning(period, camera);
+		refreshPositioningAfterZoomChange(period, camera);
+
+		nameYPosition = hitbox.getY2() - 4;
 	}
 	
-	private void definePositioning(Period period, Camera camera) {
-//		int x1 = (int) ((period.getStartDate() - camera.getX()) * camera.getZoom() + camera.getX()) + Timeline.WIDTH / 2;
-//		int x2 = (int) ((period.getEndDate() - camera.getX()) * camera.getZoom() + camera.getX()) + Timeline.WIDTH / 2;
-//		int y1 = (int) (Settings.Y_PADDING + periodLayer * Settings.PERIOD_LAYER_SIZE);
-//		int width = x2 - x1;
-//		
-//		this.hitbox = new Hitbox(x1, y1, width, Settings.PERIOD_HEIGHT);
-//
-//		nameYPosition = hitbox.getY2() - 4;
-//		
-//		definePeriodNameXPositions(period);
+	public void refreshPositioningAfterZoomChange(Period period, Camera camera) {
+		int x1 = Maths.getXPositionAfterCameraZoomChange(camera, period.getStartDate());
+		int x2 = Maths.getXPositionAfterCameraZoomChange(camera, period.getEndDate());
+		int y1 = (int) (Settings.Y_PADDING + periodLayer * Settings.PERIOD_LAYER_SIZE);
+		int width = x2 - x1;
+		
+		this.hitbox = new Hitbox(x1, y1, width, Settings.PERIOD_HEIGHT);
+		
+		definePeriodNameXPositions(period);
 	}
 	
 	public void refreshYPositioning() {
 		int y1 = (int) (Settings.Y_PADDING + periodLayer * Settings.PERIOD_LAYER_SIZE);
 		nameYPosition = y1 + Settings.PERIOD_HEIGHT - 4;
 		hitbox = new Hitbox(hitbox.getPreciseX(), y1, hitbox.getWidth(), Settings.PERIOD_HEIGHT);
-	}
-	
-	public void zoomChanged(Period period, Camera camera) {
-//		int x1 = (int) ((period.getStartDate() - camera.getX()) * camera.getZoom() + camera.getX()) + Timeline.WIDTH / 2;
-//		int x2 = (int) ((period.getEndDate() - camera.getX()) * camera.getZoom() + camera.getX()) + Timeline.WIDTH / 2;
-//		int width = x2 - x1;
-//		hitbox = new Hitbox(x1, hitbox.getPreciseY(), width, hitbox.getHeight());
-//		
-//		definePeriodNameXPositions(period);
 	}
 	
 	public void definePeriodNameXPositions(Period period) {

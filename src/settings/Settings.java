@@ -12,12 +12,12 @@ public class Settings {
 	public static final Color DATELINE_COLOUR = Color.BLACK;
 	public static final int PERIOD_LAYERS_BEFORE_DATELINE = 4;
 	
-	public static final int Y_PADDING = 7;
+	public static final int Y_PADDING = 5;
 	
-	public static final float PERIOD_LAYER_SIZE = 26;
+	public static final float PERIOD_LAYER_SIZE = 20 + Y_PADDING;
 	public static final int PERIOD_HEIGHT = (int) (PERIOD_LAYER_SIZE / 10 * 7);
 	
-	public static final int DATELINE_HEIGHT = (int) (PERIOD_LAYERS_BEFORE_DATELINE * PERIOD_LAYER_SIZE + Y_PADDING);
+	public static final int DATELINE_HEIGHT = (int) (PERIOD_LAYERS_BEFORE_DATELINE * PERIOD_LAYER_SIZE + 5 * Y_PADDING);
 	
 	public static final int PERIOD_TEXT_RECURRENCE_INTERVAL = 500;
 	
@@ -29,16 +29,16 @@ public class Settings {
 	
 	
 	public static final int TIMELINE_START = 0;
-	public static final int TIMELINE_END = 200;
+	public static final int TIMELINE_END = 2100;
 	
-	public static final int SIGNIFICANT_DATE_INTERVAL = 50;
+	public static final int SIGNIFICANT_DATE_INTERVAL = 10;
 	public static final int SIGNIFICANT_DATE_MARKER_HEIGHT = 4;//in both directions
 	
 	public static final List<Integer> DATELINE_DATES = generateDatelineDates();
 	
 	private static List<Integer> generateDatelineDates(){
-		List<Integer> dates = new ArrayList<Integer>();;
-		for(int i = TIMELINE_START; i < TIMELINE_END; i += SIGNIFICANT_DATE_INTERVAL) {
+		List<Integer> dates = new ArrayList<Integer>();
+		for(int i = TIMELINE_START; i <= TIMELINE_END; i += SIGNIFICANT_DATE_INTERVAL) {
 			dates.add(i);
 		}
 		return dates;
